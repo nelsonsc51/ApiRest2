@@ -8,11 +8,15 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.example.agamoneyapi2.repository.CategoriaRepository;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 import com.example.agamoneyapi2.model.Categoria;
 
+import java.net.URI;
 import java.util.List;
 
 @RestController
@@ -28,7 +32,11 @@ public class CategoriaResource {
 	}
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public void criar(@RequestBody Categoria categoria) {
-		categoriaRepository.save(categoria);
+	public void criar(@RequestBody Categoria categoria, HttpServletResponse response) {
+		Categoria categoriaSalva = categoriaRepository.save(categoria);
+		
+		URI uri = ServletUriComponentsBuilder.fromCurrentRequestUri().path("/{codigo}")
+				.buildAndExpand(categoriaSalva.getCodigo()).toUri();
+		response.setHeader("Location", uri.toASCIIString());
 	}
 }
